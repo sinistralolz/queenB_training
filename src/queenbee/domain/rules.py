@@ -1,6 +1,7 @@
 
 from collections import Counter
 from collections.abc import Iterable
+from dataclasses import dataclass
 from typing import Protocol
 
 from queenbee.domain.model import Alert, DomainError, SecurityEvent, Severity
@@ -11,11 +12,13 @@ class DetectionRule(Protocol):
         ...
 
 
+@dataclass(frozen=True)
 class BruteForceRule:
-    def __init__(self, threshold: int = 5) -> None:
-        if type(threshold) is not int or threshold < 1:
+    threshold: int = 5
+
+    def __post_init__(self) -> None:
+        if type(self.threshold) is not int or self.threshold < 1:
             raise DomainError("Seuil invalide")
-        self.threshold = threshold
 
     def evaluate(self, events: Iterable[SecurityEvent]) -> list[Alert]:
         counts = Counter(
