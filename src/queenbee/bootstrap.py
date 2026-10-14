@@ -1,7 +1,7 @@
 
-from queenbee.adapters.outbound.notifiers import MemoryNotifier
 from queenbee.application.services import DetectionService
 from queenbee.config import Settings
+from queenbee.domain.ports import AlertNotifier
 from queenbee.domain.rules import BruteForceRule
 from queenbee.factories import InMemoryFactory, ProdFactory
 
@@ -22,7 +22,7 @@ def bootstrap(settings: Settings, production: bool = False) -> DetectionService:
             "Le notificateur de production reste à configurer"
         )
 
-    notifier: MemoryNotifier = factory.notifier()
+    notifier: AlertNotifier = factory.notifier()
 
     return DetectionService(
         rule=BruteForceRule(),
