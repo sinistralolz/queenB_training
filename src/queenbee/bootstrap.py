@@ -9,10 +9,11 @@ from queenbee.factories import InMemoryFactory, ProdFactory
 def bootstrap(settings: Settings, production: bool = False) -> DetectionService:
     """Assemble les composants sans utiliser de Singleton."""
 
-    if production:
-        factory = ProdFactory(settings.database_path)
-    else:
-        factory = InMemoryFactory()
+    factory = (
+        ProdFactory(settings.database_path)
+        if production
+        else InMemoryFactory()
+    )
 
     repository = factory.repository()
 
