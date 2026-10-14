@@ -1,4 +1,5 @@
-# Modèle de menaces — Queen Bee (gabarit à compléter)
+
+# Modèle de menaces — Queen Bee
 
 ## 1. Actifs
 
@@ -40,6 +41,7 @@ flowchart TD
     C -->|Commande de blocage - TB3| E[Pare-feu]
     F[Analyste SOC] -->|Consultation et actions - TB4| G[Interface utilisateur]
     G --> C
+```
 
 ## 4. STRIDE par flux
 
@@ -68,3 +70,4 @@ flowchart TD
 - EX-07 : Une commande de blocage envoyée au pare-feu doit être validée et autorisée avant son exécution. Menace : élévation de privilèges. DICP : I, D. Test : `test_unauthorized_firewall_action_rejected`.
 
 - EX-08 : Seuls les analystes authentifiés et disposant des droits nécessaires doivent pouvoir effectuer des actions sur les incidents. Menace : usurpation et élévation de privilèges. DICP : C, I. Test : `test_analyst_permissions_enforced`.
+
