@@ -30,7 +30,7 @@ class SecurityEvent:
     action: str
     timestamp: datetime
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         try:
             ip_address(self.source_ip)
         except ValueError as exc:
@@ -60,11 +60,11 @@ class Alert:
 
 
 class Incident:
-    def __init__(self, alert: Alert):
+    def __init__(self, alert: Alert) -> None:
         self.alert = alert
         self.status = IncidentStatus.OPEN
 
-    def transition_to(self, new_status: IncidentStatus):
+    def transition_to(self, new_status: IncidentStatus) -> None:
         allowed = {
             IncidentStatus.OPEN: {IncidentStatus.TRIAGED},
             IncidentStatus.TRIAGED: {IncidentStatus.CLOSED},
