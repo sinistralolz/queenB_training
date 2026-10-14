@@ -12,7 +12,7 @@ class DetectionRule(Protocol):
 
 
 class BruteForceRule:
-    def __init__(self, threshold: int = 5):
+    def __init__(self, threshold: int = 5) -> None:
         if type(threshold) is not int or threshold < 1:
             raise DomainError("Seuil invalide")
         self.threshold = threshold
@@ -32,7 +32,7 @@ class BruteForceRule:
 
 
 class PortScanRule:
-    def __init__(self, threshold: int = 20):
+    def __init__(self, threshold: int = 20) -> None:
         if type(threshold) is not int or threshold < 1:
             raise DomainError("Seuil invalide")
         self.threshold = threshold
@@ -52,12 +52,12 @@ class PortScanRule:
 
 
 class RuleSet:
-    def __init__(self, rules: Iterable[DetectionRule]):
+    def __init__(self, rules: Iterable[DetectionRule]) -> None:
         self.rules = tuple(rules)
 
     def evaluate(self, events: Iterable[SecurityEvent]) -> list[Alert]:
         event_list = list(events)
-        alerts = []
+        alerts: list[Alert] = []
 
         for rule in self.rules:
             alerts.extend(rule.evaluate(event_list))
@@ -65,9 +65,12 @@ class RuleSet:
         return alerts
 
 
-def build_rule(config: dict) -> DetectionRule:
+def build_rule(config: dict[str, object]) -> DetectionRule:
     kind = config.get("kind")
-    threshold = config.get("threshold", 5 if kind == "brute_force" else 20)
+    threshold = config.get(
+        "threshold",
+        5 if kind == "brute_force" else 20
+    )
 
     if type(threshold) is not int or threshold < 1:
         raise DomainError("Seuil invalide")
