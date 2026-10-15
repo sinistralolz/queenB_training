@@ -1,9 +1,12 @@
 
-from dataclasses import dataclass
+"""Objets métier et validations de Queen Bee."""
+
+import re
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from ipaddress import ip_address
-import re
+from uuid import UUID, uuid4
 
 
 class DomainError(ValueError):
@@ -21,6 +24,14 @@ class IncidentStatus(Enum):
     OPEN = "open"
     TRIAGED = "triaged"
     CLOSED = "closed"
+
+
+@dataclass(frozen=True)
+class Principal:
+    """Utilisateur identifié et ses rôles."""
+
+    username: str
+    roles: frozenset[str]
 
 
 @dataclass(frozen=True)
@@ -59,12 +70,17 @@ class Alert:
     message: str
 
 
+@dataclass
 class Incident:
-    def __init__(self, alert: Alert) -> None:
-        self.alert = alert
-        self.status = IncidentStatus.OPEN
+    """Incident de sécurité avec identifiant et état."""
+
+    alert: Alert
+    status: IncidentStatus = IncidentStatus.OPEN
+    id: UUID = field(default_factory=uuid4)
 
     def transition_to(self, new_status: IncidentStatus) -> None:
+        """Change l'état uniquement si la transition est autorisée."""
+
         allowed = {
             IncidentStatus.OPEN: {IncidentStatus.TRIAGED},
             IncidentStatus.TRIAGED: {IncidentStatus.CLOSED},
@@ -75,3 +91,4 @@ class Incident:
             raise DomainError("Transition d'incident interdite")
 
         self.status = new_status
+
