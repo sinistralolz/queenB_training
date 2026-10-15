@@ -5,11 +5,11 @@ import logging
 from collections.abc import Iterable
 from typing import Protocol
 
-from queenbee.adapters.outbound.rate_limiter import (
-    RateLimitedNotifier as RateLimitedNotifier,
-)
+from queenbee.adapters.outbound.rate_limiter import RateLimitedNotifier
 from queenbee.domain.model import Alert
 from queenbee.domain.ports import AlertNotifier
+
+__all__ = ["RateLimitedNotifier"]
 
 audit_logger = logging.getLogger("queenbee.audit")
 
