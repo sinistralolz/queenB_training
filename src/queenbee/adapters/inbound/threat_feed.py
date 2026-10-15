@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from ipaddress import ip_address
+from typing import ClassVar
 
 from queenbee.domain.model import DomainError
 
@@ -18,7 +19,7 @@ class ThreatIndicator:
 class ThreatFeedTranslator:
     """Convertit les données externes en indicateurs fiables."""
 
-    RISK_SCORES = {
+    RISK_SCORES: ClassVar[dict[str, int]] = {
         "low": 20,
         "medium": 50,
         "high": 80,
@@ -52,3 +53,4 @@ class ThreatFeedTranslator:
             indicator=indicator,
             score=self.RISK_SCORES[risk_level],
         )
+
