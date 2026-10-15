@@ -94,3 +94,29 @@ Les tests réalisés pendant l'A1 vérifient notamment :
 - Tests des autorisations des services applicatifs.
 - Vérification automatique des dépendances entre les couches.
 - Validation de l'ensemble du projet avec `make check`.
+
+## Comparaison : architecture hexagonale et microservices
+
+| Critère | Architecture hexagonale | Microservices |
+|---|---|---|
+| Organisation | Séparation entre domaine, application et adaptateurs | Plusieurs services indépendants |
+| Déploiement | Une seule application peut suffire | Chaque service peut être déployé séparément |
+| Communication | Principalement des appels internes | Souvent des appels réseau ou des messages |
+| Tests | Tests unitaires facilités par les ports | Tests d'intégration distribués plus complexes |
+| Sécurité | Contrôles aux frontières et dans les services | Contrôles supplémentaires entre les services |
+| Maintenance | Adaptée à une application de taille modérée | Utile pour plusieurs équipes ou composants autonomes |
+| Complexité | Modérée | Plus élevée |
+
+### Choix pour Queen Bee
+
+Nous retenons l'architecture hexagonale, car Queen Bee est encore un projet de taille limitée.
+
+Elle permet de séparer les règles de détection des composants techniques sans ajouter la complexité de plusieurs services à déployer et à sécuriser.
+
+Cette organisation permet notamment de remplacer un stockage en mémoire par SQLite, ou de modifier le système de notification, sans devoir réécrire les règles métier.
+
+Les microservices pourraient devenir intéressants si Queen Bee devait gérer plusieurs composants indépendants à grande échelle.
+
+**Ces deux approches ne sont pas incompatibles :** un microservice peut lui-même utiliser une architecture hexagonale.
+
+Pour Queen Bee, nous privilégions donc une application simple à déployer, mais dont les composants internes restent indépendants et testables.
