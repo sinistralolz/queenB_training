@@ -27,12 +27,14 @@ class BlockIpCommand:
             address = ip_or_firewall
 
         if not isinstance(address, str):
-            raise ValueError("Adresse IP invalide")
+            raise ValueError("IP address does not appear to be valid")
 
         try:
             ip_address(address)
         except ValueError as exc:
-            raise ValueError("Adresse IP invalide") from exc
+            raise ValueError(
+                "IP address does not appear to be valid"
+            ) from exc
 
         object.__setattr__(self, "ip", address)
         object.__setattr__(self, "firewall", firewall)
@@ -46,13 +48,15 @@ class InMemoryFirewall:
 
     @property
     def blocked(self) -> set[str]:
-        """Alias attendu par les tests du professeur."""
+        """Retourne les adresses IP bloquées."""
         return self.blocked_ips
 
     def block(self, command: BlockIpCommand) -> None:
+        """Bloque une adresse IP."""
         self.blocked_ips.add(command.ip)
 
     def unblock(self, command: BlockIpCommand) -> None:
+        """Débloque une adresse IP."""
         self.blocked_ips.discard(command.ip)
 
 
