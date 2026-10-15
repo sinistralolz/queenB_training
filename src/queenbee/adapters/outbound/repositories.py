@@ -11,7 +11,12 @@ class InMemoryIncidentRepository:
         self.incidents: list[Incident] = []
 
     def save(self, incident: Incident) -> None:
+        """Enregistre un incident."""
         self.incidents.append(incident)
+
+    def list_all(self) -> list[Incident]:
+        """Retourne les incidents enregistrés."""
+        return list(self.incidents)
 
 
 class SqliteIncidentRepository:
@@ -33,6 +38,7 @@ class SqliteIncidentRepository:
         self.connection.commit()
 
     def save(self, incident: Incident) -> None:
+        """Enregistre un incident dans SQLite."""
         self.connection.execute(
             """
             INSERT INTO incidents (rule, source_ip, severity, status)
