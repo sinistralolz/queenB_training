@@ -11,6 +11,13 @@ class IncidentRepository(Protocol):
         ...
 
 
+class IncidentReader(Protocol):
+    """Contrat pour consulter les incidents."""
+
+    def list_all(self) -> list[Incident]:
+        ...
+
+
 class AlertNotifier(Protocol):
     """Contrat pour envoyer une alerte."""
 
