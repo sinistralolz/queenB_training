@@ -1,0 +1,24 @@
+
+@startuml
+title Queen Bee - C4 Niveau 1 - Contexte du systeme
+
+!include <C4/C4_Context>
+
+LAYOUT_LEFT_RIGHT()
+
+Person(analyst, "Analyste SOC", "Consulte les alertes et traite les incidents")
+Person(admin, "Administrateur", "Configure les regles et les acces")
+
+System(queenbee, "Queen Bee", "Outil de detection et de gestion des incidents de securite")
+
+System_Ext(agent, "Agent de collecte", "Transmet les evenements de securite")
+System_Ext(notifications, "Systeme de notification", "Recoit les alertes")
+System_Ext(firewall, "Pare-feu", "Applique les actions de blocage IP")
+
+Rel(agent, queenbee, "Envoie des evenements", "JSON signe HMAC")
+Rel(analyst, queenbee, "Consulte et traite les incidents")
+Rel(admin, queenbee, "Configure et administre")
+Rel(queenbee, notifications, "Transmet les alertes")
+Rel(queenbee, firewall, "Demande le blocage d'une IP")
+
+@enduml
