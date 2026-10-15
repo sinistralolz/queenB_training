@@ -1,10 +1,21 @@
 
 """Système de notification des alertes de Queen Bee."""
 
+import logging
 from collections.abc import Iterable
+from typing import Protocol
 
+from queenbee.adapters.outbound.rate_limiter import RateLimitedNotifier
 from queenbee.domain.model import Alert
 from queenbee.domain.ports import AlertNotifier
+
+audit_logger = logging.getLogger("queenbee.audit")
+
+
+class NotificationTarget(Protocol):
+    """Destinataire acceptant la méthode notify."""
+
+    def notify(self, alert: Alert) -> None: ...
 
 
 class MemoryNotifier:
@@ -15,6 +26,9 @@ class MemoryNotifier:
 
     def send(self, alert: Alert) -> None:
         self.received.append(alert)
+
+    def notify(self, alert: Alert) -> None:
+        self.send(alert)
 
 
 class ObserverNotifier:
@@ -40,6 +54,32 @@ class ObserverNotifier:
 
         for subscriber in self.subscribers:
             try:
+                subscriber.send(alert)
+            except Exception:
+                # Une panne ne doit pas bloquer les autres abonnés.
+                self.failed_notifications += 1
+
+    def notify(self, alert: Alert) -> None:
+        self.send(alert)
+
+
+class AuditedNotifier:
+    """Ajoute une trace d'audit avant chaque notification."""
+
+    def __init__(self, notifier: NotificationTarget) -> None:
+        self.notifier = notifier
+
+    def notify(self, alert: Alert) -> None:
+        audit_logger.info(
+            "Notification de sécurité : règle=%s, source=%s",
+            alert.rule,
+            alert.source_ip,
+        )
+        self.notifier.notify(alert)
+
+    def send(self, alert: Alert) -> None:
+        self.notify(alert)
+
                 subscriber.send(alert)
             except Exception:
                 # Une panne ne doit pas bloquer les autres abonnés.
