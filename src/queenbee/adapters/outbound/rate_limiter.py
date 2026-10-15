@@ -3,9 +3,15 @@
 
 from collections.abc import Callable
 from time import monotonic
+from typing import Protocol
 
 from queenbee.domain.model import Alert
-from queenbee.domain.ports import AlertNotifier
+
+
+class NotificationTarget(Protocol):
+    """Destinataire d'une alerte."""
+
+    def send(self, alert: Alert) -> None: ...
 
 
 class RateLimitedNotifier:
@@ -13,7 +19,7 @@ class RateLimitedNotifier:
 
     def __init__(
         self,
-        notifier: AlertNotifier,
+        notifier: NotificationTarget,
         max_per_window: int = 3,
         window_s: float = 60.0,
         clock: Callable[[], float] | None = None,
@@ -47,6 +53,15 @@ class RateLimitedNotifier:
             self.dropped += 1
             return
 
-        self.notifier.send(alert)
+        if hasattr(self.notifier, "notify"):
+            self.notifier.notify(alert)
+        else:
+            self.notifier.send(alert)
+
         self.window_count += 1
         self.sent += 1
+
+    def notify(self, alert: Alert) -> None:
+        """Permet aussi l'utilisation de notify()."""
+
+        self.send(alert)
