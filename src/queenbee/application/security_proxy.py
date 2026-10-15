@@ -10,15 +10,20 @@ class AccessDeniedError(Exception):
 
 
 class IncidentReaderProxy:
-    """Protège la consultation des incidents."""
+    """Contrôle les droits avant de consulter les incidents."""
 
-    def __init__(self, reader: IncidentReader) -> None:
+    def __init__(
+        self,
+        reader: IncidentReader,
+        roles: Iterable[str],
+    ) -> None:
         self.reader = reader
+        self.roles = frozenset(roles)
 
-    def list_all(self, roles: Iterable[str]) -> list[Incident]:
-        """Vérifie les droits avant de consulter les incidents."""
+    def list_all(self) -> list[Incident]:
+        """Autorise uniquement les viewers et analystes."""
 
-        if not {"viewer", "analyst"}.intersection(roles):
+        if not self.roles.intersection({"viewer", "analyst"}):
             raise AccessDeniedError("Accès aux incidents refusé")
 
         return self.reader.list_all()
