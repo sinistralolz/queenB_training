@@ -1,0 +1,100 @@
+
+@startuml
+title Queen Bee - Jour 2 - Patterns defensifs
+
+skinparam classAttributeIconSize 0
+left to right direction
+
+package "Proxy - Controle des acces" {
+    interface IncidentReader {
+        +list_all() : list
+    }
+
+    class IncidentReaderProxy {
+        -reader : IncidentReader
+        -roles : frozenset
+        +list_all() : list
+    }
+
+    class InMemoryIncidentRepository {
+        +save(incident)
+        +list_all() : list
+    }
+
+    IncidentReaderProxy ..|> IncidentReader
+    InMemoryIncidentRepository ..|> IncidentReader
+    IncidentReaderProxy --> IncidentReader : protege
+}
+
+package "Decorator - Limitation des alertes" {
+    interface AlertNotifier {
+        +send(alert)
+    }
+
+    class RateLimitedNotifier {
+        -max_per_window : int
+        -window_s : float
+        +sent : int
+        +dropped : int
+        +send(alert)
+    }
+
+    RateLimitedNotifier ..|> AlertNotifier
+    RateLimitedNotifier --> AlertNotifier : enveloppe
+}
+
+package "Adapter - Journaux SSH" {
+    class SecurityEvent {
+        +source_ip : str
+        +username : str
+        +action : str
+        +timestamp : datetime
+    }
+
+    class SSHLogAdapter {
+        +parse_ssh_failure(line, timestamp)
+    }
+
+    SSHLogAdapter ..> SecurityEvent : cree et valide
+}
+
+package "Observer - Notifications" {
+    class ObserverNotifier {
+        -subscribers : list
+        +failed_notifications : int
+        +subscribe(notifier)
+        +unsubscribe(notifier)
+        +send(alert)
+    }
+
+    class MemoryNotifier {
+        +received : list
+        +send(alert)
+    }
+
+    ObserverNotifier --> AlertNotifier : diffuse
+    MemoryNotifier ..|> AlertNotifier
+}
+
+package "Command - Blocage IP" {
+    class BlockIpCommand {
+        +ip : str
+    }
+
+    class CommandHistory {
+        +commands : list
+        +execute(command, firewall)
+        +undo(firewall)
+    }
+
+    class InMemoryFirewall {
+        +blocked_ips : set
+        +block(command)
+        +unblock(command)
+    }
+
+    CommandHistory --> BlockIpCommand : conserve
+    CommandHistory --> InMemoryFirewall : execute
+}
+
+@enduml
