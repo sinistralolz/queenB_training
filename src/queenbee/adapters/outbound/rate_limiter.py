@@ -1,5 +1,8 @@
 
+"""Limitation du nombre d'alertes transmises."""
+
 from collections.abc import Callable
+from time import monotonic
 
 from queenbee.domain.model import Alert
 from queenbee.domain.ports import AlertNotifier
@@ -19,8 +22,6 @@ class RateLimitedNotifier:
             raise ValueError("Limites invalides")
 
         if clock is None:
-            from time import monotonic
-
             clock = monotonic
 
         self.notifier = notifier
