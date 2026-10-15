@@ -5,7 +5,9 @@ import logging
 from collections.abc import Iterable
 from typing import Protocol
 
-from queenbee.adapters.outbound.rate_limiter import RateLimitedNotifier
+from queenbee.adapters.outbound.rate_limiter import (
+    RateLimitedNotifier as RateLimitedNotifier,
+)
 from queenbee.domain.model import Alert
 from queenbee.domain.ports import AlertNotifier
 
@@ -79,8 +81,3 @@ class AuditedNotifier:
 
     def send(self, alert: Alert) -> None:
         self.notify(alert)
-
-                subscriber.send(alert)
-            except Exception:
-                # Une panne ne doit pas bloquer les autres abonnés.
-                self.failed_notifications += 1
