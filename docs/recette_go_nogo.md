@@ -18,7 +18,7 @@ avant sa livraison.
 | Analyse Bandit | Aucune alerte bloquante sur src | OK |
 | Architecture hexagonale | 1 contrat respecté | OK |
 | Tests des 7 corrections | Tests de non-régression réussis | OK |
-| Audit des dépendances | Audit réel non effectué | À vérifier |
+| Audit des dépendances | Aucune vulnérabilité connue détectée dans les dépendances déclarées | OK |
 | Schéma d'infrastructure | Documenté, non déployé | Documenté |
 | Sauvegardes et PRA | Stratégie définie, non testée | À vérifier |
 
