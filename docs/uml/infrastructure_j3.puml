@@ -1,0 +1,62 @@
+
+@startuml
+title Queen Bee - Architecture réseau sécurisée (J3-A2)
+
+top to bottom direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+cloud "Agents / Réseau externe" as AGENTS
+
+node "Pare-feu périmétrique" as FW1
+
+rectangle "DMZ" #E3F2FD {
+    component "API Queen Bee\nHTTPS : 443" as API
+}
+
+node "Pare-feu interne" as FW2
+
+rectangle "Zone applicative" #E8F5E9 {
+    component "Services Queen Bee\nTraitement des incidents" as APP
+}
+
+rectangle "Zone données" #FFF3E0 {
+    database "SQLite\nStockage local protégé" as DB
+}
+
+rectangle "Zone supervision" #F3E5F5 {
+    component "Collecteur de journaux" as LOG
+    component "SIEM\n(Wazuh envisagé)" as SIEM
+}
+
+AGENTS --> FW1 : HTTPS / TCP 443
+FW1 --> API : Flux autorisé
+
+API --> FW2 : HTTPS / TCP 8443\n(cible)
+FW2 --> APP : Flux autorisé
+
+APP --> DB : Accès fichier local\n(pas de port SQL)
+
+API --> LOG : Journaux
+APP --> LOG : Journaux
+LOG --> SIEM : Transport chiffré
+
+note bottom of DB
+SQLite est une base locale.
+Aucun serveur SQL distant
+n'est requis à ce stade.
+end note
+
+note bottom of FW2
+Politique deny all par défaut.
+Seuls les flux nécessaires
+sont autorisés.
+end note
+
+legend bottom
+Architecture cible proposée.
+Segmentation et SIEM non déployés.
+Les ports internes sont à valider.
+endlegend
+
+@enduml
