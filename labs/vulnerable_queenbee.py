@@ -1,22 +1,20 @@
 
 # ruff: noqa
-"""VARIANTE VOLONTAIREMENT FRAGILE de Queen Bee — usage LABORATOIRE uniquement (J3-A1).
+"""Variante de laboratoire Queen Bee — J3-A1.
 
-Sept failles d'architecture à exploiter (en local), corriger, puis vérifier avec bandit/pip-audit.
-Chaque faille porte un numéro FAILLE-n ; la correction de référence est dans src/queenbee.
-
-FAILLE-1 corrigée : secret chargé depuis l'environnement.
+Failles 1, 2 et 3 corrigées.
+Failles 4 à 7 encore présentes pour les exercices suivants.
 """
 
+import json
 import os
-import pickle
 import re
 import sqlite3
 
 
-# FAILLE-1 CORRIGÉE : aucun secret codé en dur.
+# FAILLE-1 CORRIGÉE : secret chargé depuis l'environnement.
 def get_api_key() -> str:
-    """Récupère la clé depuis une variable d'environnement."""
+    """Récupère la clé API depuis une variable d'environnement."""
     key = os.environ.get("QUEENBEE_LAB_API_KEY")
 
     if not key:
@@ -25,7 +23,7 @@ def get_api_key() -> str:
     return key
 
 
-# FAILLE-2 : quantificateurs imbriqués -> ReDoS
+# FAILLE-2 CORRIGÉE : expression régulière sans quantificateurs imbriqués.
 USER_RE = re.compile(r"^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$")
 
 
@@ -35,23 +33,29 @@ conn.execute(
 )
 
 
-# FAILLE-3 : désérialisation non sûre (RCE)
-def receive_agent_message(raw: bytes):
-    return pickle.loads(raw)
+# FAILLE-3 CORRIGÉE : utilisation de JSON à la place de pickle.
+def receive_agent_message(raw: bytes) -> dict:
+    """Décode un message JSON sans exécuter de code."""
+    message = json.loads(raw)
+
+    if not isinstance(message, dict):
+        raise ValueError("Le message doit être un objet JSON")
+
+    return message
 
 
 def is_valid_username(name: str) -> bool:
-    return USER_RE.match(name) is not None
+    return USER_RE.fullmatch(name) is not None
 
 
-# FAILLE-4 : injection SQL (f-string)
+# FAILLE-4 : injection SQL (f-string).
 def find_incidents(ip: str):
     return conn.execute(
         f"SELECT * FROM incident WHERE ip = '{ip}'"
     ).fetchall()
 
 
-# FAILLE-5 : aucune vérification d'autorisation dans la couche service
+# FAILLE-5 : aucune vérification d'autorisation.
 def close_incident(user: str, incident_id: int) -> None:
     conn.execute(
         "UPDATE incident SET status='closed' WHERE id=?",
@@ -59,11 +63,11 @@ def close_incident(user: str, incident_id: int) -> None:
     )
 
 
-# FAILLE-6 : appel inter-services sans authentification mutuelle
+# FAILLE-6 : appel inter-services sans authentification mutuelle.
 def call_enrichment_service(ip: str) -> dict:
     return {"ip": ip, "reputation": "unknown"}
 
 
-# FAILLE-7 : comparaison non constante (timing)
+# FAILLE-7 : comparaison non constante (timing).
 def check_token(token: str) -> bool:
     return token == get_api_key()
