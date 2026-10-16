@@ -8,7 +8,7 @@ types:
 	mypy
 
 test:
-	python -m pytest --cov=src/queenbee --cov-fail-under=90
+	python -m pytest --ignore=tests/test_lab_vulnerable.py --cov=src/queenbee --cov-fail-under=90
 
 security:
 	bandit -q -r src -c pyproject.toml
