@@ -26,7 +26,7 @@ def get_api_key() -> str:
 
 
 # FAILLE-2 : quantificateurs imbriqués -> ReDoS
-USER_RE = re.compile(r"^([a-zA-Z0-9]+\s?)*$")
+USER_RE = re.compile(r"^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$")
 
 
 conn = sqlite3.connect(":memory:")
