@@ -1,4 +1,6 @@
 
+SHELL := /bin/bash
+
 .PHONY: lint types test security arch check
 
 lint:
@@ -12,7 +14,7 @@ test:
 
 security:
 	bandit -q -r src -c pyproject.toml
-	python -m pip_audit --no-deps -r /dev/null
+	python -m pip_audit -r <(python -c "import tomllib; p=tomllib.load(open('pyproject.toml','rb')); print('\n'.join(p['project']['optional-dependencies']['dev']))")
 
 arch:
 	PYTHONPATH=src lint-imports
