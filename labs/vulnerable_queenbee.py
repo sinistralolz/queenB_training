@@ -2,8 +2,8 @@
 # ruff: noqa
 """Variante de laboratoire Queen Bee — J3-A1.
 
-Failles 1, 2 et 3 corrigées.
-Failles 4 à 7 encore présentes pour les exercices suivants.
+Failles 1, 2, 3 et 4 corrigées.
+Failles 5, 6 et 7 encore présentes pour les exercices suivants.
 """
 
 import json
@@ -48,10 +48,12 @@ def is_valid_username(name: str) -> bool:
     return USER_RE.fullmatch(name) is not None
 
 
-# FAILLE-4 : injection SQL (f-string).
+# FAILLE-4 CORRIGÉE : requête SQL paramétrée.
 def find_incidents(ip: str):
+    """Recherche les incidents sans risque d'injection SQL."""
     return conn.execute(
-        f"SELECT * FROM incident WHERE ip = '{ip}'"
+        "SELECT * FROM incident WHERE ip = ?",
+        (ip,),
     ).fetchall()
 
 
@@ -71,3 +73,4 @@ def call_enrichment_service(ip: str) -> dict:
 # FAILLE-7 : comparaison non constante (timing).
 def check_token(token: str) -> bool:
     return token == get_api_key()
+
