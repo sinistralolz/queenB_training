@@ -1,6 +1,7 @@
 
 """Tests complémentaires des adaptateurs SMTP et SQLite."""
 
+import sqlite3
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -20,7 +21,9 @@ def make_alert() -> Alert:
     )
 
 
-def test_email_notifier_requires_password(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_email_notifier_requires_password(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Refuse l'envoi si le mot de passe SMTP est absent."""
     monkeypatch.delenv("SMTP_PASSWORD", raising=False)
 
@@ -67,8 +70,6 @@ def test_email_notifier_sends_secure_message(
 
 def test_sqlite_repository_saves_incident(tmp_path) -> None:
     """Enregistre un incident dans une base SQLite temporaire."""
-    import sqlite3
-
     db_path = tmp_path / "incidents.db"
     repository = SQLiteIncidentRepository(str(db_path))
 
