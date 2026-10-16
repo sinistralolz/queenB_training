@@ -2,10 +2,11 @@
 # ruff: noqa
 """Variante de laboratoire Queen Bee — J3-A1.
 
-Failles 1 à 5 corrigées.
-Failles 6 et 7 encore présentes.
+Failles 1 à 6 corrigées.
+Faille 7 encore présente.
 """
 
+import hmac
 import json
 import os
 import re
@@ -55,7 +56,7 @@ def find_incidents(ip: str):
 
 
 # FAILLE-5 CORRIGÉE : contrôle des autorisations.
-# Simulation locale d'un annuaire de rôles.
+# Simulation locale des rôles.
 USER_ROLES = {
     "administrateur": "admin",
     "analyste": "analyst",
@@ -64,7 +65,6 @@ USER_ROLES = {
 
 
 def close_incident(user: str, incident_id: int) -> None:
-    """Seuls les administrateurs et analystes peuvent fermer un incident."""
     role = USER_ROLES.get(user)
 
     if role not in {"admin", "analyst"}:
@@ -78,8 +78,22 @@ def close_incident(user: str, incident_id: int) -> None:
     )
 
 
-# FAILLE-6 : absence d'authentification inter-services.
-def call_enrichment_service(ip: str) -> dict:
+# FAILLE-6 CORRIGÉE : authentification inter-services.
+def get_service_token() -> str:
+    """Charge un secret distinct de la clé API des agents."""
+    token = os.environ.get("QUEENBEE_SERVICE_TOKEN")
+
+    if not token:
+        raise RuntimeError("QUEENBEE_SERVICE_TOKEN non configuré")
+
+    return token
+
+
+def call_enrichment_service(ip: str, token: str) -> dict:
+    """Refuse les appels sans jeton inter-services valide."""
+    if not hmac.compare_digest(token, get_service_token()):
+        raise PermissionError("Service non authentifié")
+
     return {"ip": ip, "reputation": "unknown"}
 
 
