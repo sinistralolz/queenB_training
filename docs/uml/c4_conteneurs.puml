@@ -1,0 +1,48 @@
+
+@startuml
+title Queen Bee - C4 Niveau 2 : Conteneurs
+
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Analyste SOC" as ANALYST
+node "Agent de collecte" as AGENT
+cloud "Source de renseignements\nsur les menaces" as FEED
+
+rectangle "Système Queen Bee" {
+
+    component "API Agent\n[Python]" as API
+
+    component "Services applicatifs\n[Python]" as APP
+
+    component "Moteur de règles\n[Domaine métier]" as RULES
+
+    component "Adaptateurs\n[Entrées / Sorties]" as ADAPTERS
+
+    database "Stockage des incidents\n[SQLite]" as DB
+}
+
+ANALYST --> APP : Consulter et traiter\nles incidents
+AGENT --> API : Transmettre les événements
+FEED --> ADAPTERS : Fournir des renseignements
+
+API --> APP : Transmettre les événements
+APP --> RULES : Appliquer les règles métier
+APP --> ADAPTERS : Utiliser les ports
+ADAPTERS --> DB : Enregistrer / lire\nles incidents
+
+note bottom of APP
+Architecture hexagonale :
+les services applicatifs utilisent
+les interfaces du domaine.
+end note
+
+legend bottom
+Vue logique des composants Queen Bee.
+Les frontières représentent les responsabilités,
+pas nécessairement des serveurs distincts.
+Les protocoles exacts restent à valider.
+endlegend
+
+@enduml
